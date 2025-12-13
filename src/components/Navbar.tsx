@@ -6,11 +6,11 @@ function Navbar() {
   const navigate = useNavigate();
 
   const dashboardPath =
-    user?.role === "ADMIN"
+    user?.role === "admin"
       ? "/dashboard/admin"
-      : user?.role === "ALUMNI"
+      : user?.role === "alumni"
       ? "/dashboard/alumni"
-      : user?.role === "LEARNER"
+      : user?.role === "learner"
       ? "/dashboard/learner"
       : "/";
 

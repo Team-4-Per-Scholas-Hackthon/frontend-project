@@ -1,4 +1,4 @@
-export type UserRole = "ADMIN" | "ALUMNI" | "LEARNER";
+export type UserRole = "admin" | "alumni" | "learner";
 
 export interface BaseUser {
   _id: string;
@@ -8,22 +8,22 @@ export interface BaseUser {
   role: UserRole;
 }
 
-export interface Alumni extends BaseUser {
-  role: "ALUMNI";
+export interface alumni extends BaseUser {
+  role: "alumni";
   skills: string[];
   cohort?: string;
   availability?: string; // e.g. "Evenings", "Weekends"
 }
 
-export interface Learner extends BaseUser {
-  role: "LEARNER";
+export interface learner extends BaseUser {
+  role: "learner";
   skills: string[];
   cohort?: string;
   instructor?: string;
 }
 
-export interface Admin extends BaseUser {
-  role: "ADMIN";
+export interface admin extends BaseUser {
+  role: "admin";
 }
 
-export type AnyUser = Alumni | Learner | Admin;
+export type AnyUser = alumni | learner | admin;

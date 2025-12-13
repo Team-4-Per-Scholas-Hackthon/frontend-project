@@ -2,7 +2,7 @@ import { useAuth } from "../context/AuthContext";
 
 function AlumniDashboard() {
   const { user } = useAuth();
-  if (!user || user.role !== "ALUMNI") return null;
+  if (!user || user.role !== "alumni") return null;
 
   return (
     <div className="space-y-6">
