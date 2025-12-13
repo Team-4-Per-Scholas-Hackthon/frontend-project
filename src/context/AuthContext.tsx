@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const logInWithProvider = (provider: "github" | "google") => {
 		window.location.href = `${
 			import.meta.env.VITE_BACKEND_URL
-		}/auth/${provider}`;
+		}/users/auth/${provider}`;
 	};
 
 	const logOut = () => {
