@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logInWithEmail = async (email: string, password: string) => {
-    const res = await apiClient.post("/auth/login", { email, password });
+    const res = await apiClient.post("/users/login", { email, password });
     const { user: u, token: t } = res.data as { user: AnyUser; token: string };
     saveAuth(u, t);
   };
