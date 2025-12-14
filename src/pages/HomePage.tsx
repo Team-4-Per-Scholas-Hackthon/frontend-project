@@ -14,7 +14,7 @@ function HomePage() {
 						Scholas alumni and learners to level up skills, confidence, and
 						careers.
 					</p>
-					<div className="flex gap-3">
+					{/* <div className="flex gap-3">
 						<Link
 							to="/auth"
 							className="px-4 py-2 rounded bg-sky-500 hover:bg-sky-600 text-white text-sm font-medium">
@@ -25,7 +25,24 @@ function HomePage() {
 							className="px-4 py-2 rounded border border-slate-600 text-slate-200 text-sm hover:bg-slate-800">
 							Learn more
 						</a>
-					</div>
+					</div>           */}
+
+
+          <Link
+              to="/auth"
+              className="px-4 py-2 rounded bg-sky-500 hover:bg-sky-600 text-white text-sm font-medium"
+            >
+              Get started
+            </Link>
+            <Link
+              to="/learn-more"
+              className="px-4 py-2 rounded border border-slate-600 text-slate-200 text-sm hover:bg-slate-800"
+            >
+              Learn more
+            </Link>
+
+
+
 				</div>
 				<div className="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-sm text-slate-200">
 					<p className="font-semibold mb-2 text-emerald-300">Hackathon Focus</p>

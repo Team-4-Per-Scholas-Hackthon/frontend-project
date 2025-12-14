@@ -8,6 +8,8 @@ import AlumniDashboard from "./pages/AlumniDashboard";
 import LearnerDashboard from "./pages/LearnerDashboard";
 import type { JSX } from "react";
 
+import LearnMorePage from "./pages/LearnMorePage";
+
 function ProtectedRoute({
   children,
   allowedRoles,
@@ -31,6 +33,9 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/auth" element={<AuthPage />} />
+
+          <Route path="/learn-more" element={<LearnMorePage />} /> 
+          
 
           <Route
             path="/dashboard/admin"
