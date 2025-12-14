@@ -7,66 +7,65 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AlumniDashboard from "./pages/AlumniDashboard";
 import LearnerDashboard from "./pages/LearnerDashboard";
 import type { JSX } from "react";
+import UserFormPage from "./pages/userFormPage";
 
 import LearnMorePage from "./pages/LearnMorePage";
 
 function ProtectedRoute({
-  children,
-  allowedRoles,
+	children,
+	allowedRoles,
 }: {
-  children: JSX.Element;
-  allowedRoles?: string[];
+	children: JSX.Element;
+	allowedRoles?: string[];
 }) {
-  const { user } = useAuth();
-  if (!user) return <Navigate to="/auth" replace />;
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
-  }
-  return children;
+	const { user } = useAuth();
+	if (!user) return <Navigate to="/auth" replace />;
+	if (allowedRoles && !allowedRoles.includes(user.role)) {
+		return <Navigate to="/" replace />;
+	}
+	return children;
 }
 
 function App() {
-  return (
-    <div className="min-h-screen bg-slate-900 text-slate-50">
-      <Navbar />
-      <main className="max-w-6xl mx-auto px-4 py-6">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/auth" element={<AuthPage />} />
+	return (
+		<div className="min-h-screen bg-slate-900 text-slate-50">
+			<Navbar />
+			<main className="max-w-6xl mx-auto px-4 py-6">
+				<Routes>
+					<Route path="/" element={<HomePage />} />
+					<Route path="/auth" element={<AuthPage />} />
+					<Route path="/userform" element={<UserFormPage />} />
 
-          <Route path="/learn-more" element={<LearnMorePage />} /> 
-          
+					<Route
+						path="/dashboard/admin"
+						element={
+							<ProtectedRoute allowedRoles={["ADMIN"]}>
+								<AdminDashboard />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/dashboard/alumni"
+						element={
+							<ProtectedRoute allowedRoles={["ALUMNI"]}>
+								<AlumniDashboard />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/dashboard/learner"
+						element={
+							<ProtectedRoute allowedRoles={["LEARNER"]}>
+								<LearnerDashboard />
+							</ProtectedRoute>
+						}
+					/>
 
-          <Route
-            path="/dashboard/admin"
-            element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard/alumni"
-            element={
-              <ProtectedRoute allowedRoles={["ALUMNI"]}>
-                <AlumniDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard/learner"
-            element={
-              <ProtectedRoute allowedRoles={["LEARNER"]}>
-                <LearnerDashboard />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
-    </div>
-  );
+					<Route path="*" element={<Navigate to="/" replace />} />
+				</Routes>
+			</main>
+		</div>
+	);
 }
 
 export default App;
