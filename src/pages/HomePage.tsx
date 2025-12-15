@@ -64,12 +64,18 @@ function HomePage() {
 					</p>
 				</div>
 				<div className="bg-slate-800/60 border border-slate-700 rounded-lg p-4">
-					<h2 className="font-semibold text-emerald-300 mb-1">Learners</h2>
-					<p className="text-sm text-slate-200">
-						Find mentors by skill, cohort, or track. Ask quick questions or
-						schedule deeper mentoring sessions.
-					</p>
-				</div>
+  <h2 className="font-semibold text-emerald-300 mb-1">Learners</h2>
+  <p className="text-sm text-slate-200 mb-3">
+    Find mentors by skill, cohort, or track. Ask quick questions or
+    schedule deeper mentoring sessions.
+  </p>
+  <Link
+    to="/profile/learner"
+    className="inline-block mt-1 px-3 py-1.5 rounded bg-emerald-500 hover:bg-emerald-600 text-xs text-white font-medium"
+  >
+    Create your learner profile
+  </Link>
+</div>
 				<div className="bg-slate-800/60 border border-slate-700 rounded-lg p-4">
 					<h2 className="font-semibold text-violet-300 mb-1">AI Assist</h2>
 					<p className="text-sm text-slate-200">

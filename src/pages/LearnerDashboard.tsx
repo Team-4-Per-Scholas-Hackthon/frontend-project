@@ -1,8 +1,14 @@
 import { useState } from "react";
 
+
+
 function LearnerDashboard() {
+
   const [searchSkill, setSearchSkill] = useState("");
   const [searchCohort, setSearchCohort] = useState("");
+
+
+
 
   return (
     <div className="space-y-6">

@@ -21,6 +21,7 @@ function AuthPage() {
 		try {
 			setError("");
 			setLoading(true);
+      
 
 			if (mode === "login") {
 				await logInWithEmail(email, password);
@@ -37,6 +38,23 @@ function AuthPage() {
 			setLoading(false);
 		}
 	};
+
+    
+//   if (mode === "login") {
+//   await logInWithEmail(email, password);
+//   const stored = localStorage.getItem("peertrack_user");
+//   const user = stored ? JSON.parse(stored) : null;
+
+//   if (user?.role === "learner") {
+//     navigate(`/dashboard/learner`);
+//   } else if (user?.role === "alumni") {
+//     navigate(`/dashboard/alumni`);
+//   } else if (user?.role === "admin") {
+//     navigate(`/dashboard/admin`);
+//   } else {
+//     navigate("/");
+//   }
+// }
 
 	return (
 		<div className="max-w-md mx-auto mt-10 bg-slate-900/80 border border-slate-700 rounded-xl p-6 shadow-lg">
