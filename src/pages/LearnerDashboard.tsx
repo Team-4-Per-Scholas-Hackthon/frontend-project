@@ -1,14 +1,9 @@
 import { useState } from "react";
-
-
+import VirtualTutorChat from "../components/VirtualTutorChat";
 
 function LearnerDashboard() {
-
   const [searchSkill, setSearchSkill] = useState("");
   const [searchCohort, setSearchCohort] = useState("");
-
-
-
 
   return (
     <div className="space-y-6">
@@ -16,6 +11,7 @@ function LearnerDashboard() {
         Learner Dashboard
       </h1>
 
+      {/* Find a Tutor search */}
       <section className="bg-slate-800/70 border border-slate-700 rounded-lg p-4">
         <h2 className="text-lg font-semibold text-sky-300 mb-2">
           Find a Tutor
@@ -45,12 +41,13 @@ function LearnerDashboard() {
           </div>
           <div className="flex items-end">
             <button className="w-full px-3 py-2 rounded bg-sky-500 hover:bg-sky-600 text-xs font-medium">
-              Smart match (AI)
+              Find Tutor (AI)
             </button>
           </div>
         </div>
       </section>
 
+      {/* Matched tutors + Virtual Tutor chat */}
       <section className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2 bg-slate-800/70 border border-slate-700 rounded-lg p-4">
           <h2 className="text-lg font-semibold text-slate-100 mb-2">
@@ -65,20 +62,7 @@ function LearnerDashboard() {
           </div>
         </div>
 
-        <div className="bg-slate-800/70 border border-slate-700 rounded-lg p-4">
-          <h2 className="text-lg font-semibold text-violet-300 mb-2">
-            Quick Help AI Chat
-          </h2>
-          <div className="h-32 mb-2 rounded bg-slate-900/80 border border-slate-700 text-xs text-slate-300 p-2 overflow-y-auto">
-            <p className="text-slate-500 italic">
-              Ask a question to get hints or summaries before your session.
-            </p>
-          </div>
-          <input
-            className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-100"
-            placeholder="Ask: “Explain Big O in simple terms…”"
-          />
-        </div>
+        <VirtualTutorChat />
       </section>
     </div>
   );
