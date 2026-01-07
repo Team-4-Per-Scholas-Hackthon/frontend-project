@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { apiClient } from "../clients/apiClient";
 
 function AuthPage() {
 	const { logInWithEmail, logInWithProvider, user } = useAuth();
@@ -8,6 +9,8 @@ function AuthPage() {
 
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [username, setUsername] = useState("");
+	const [role, setRole] = useState("");
 	const [mode, setMode] = useState<"login" | "register">("login");
 	const [error, setError] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -21,15 +24,19 @@ function AuthPage() {
 		try {
 			setError("");
 			setLoading(true);
-      
 
 			if (mode === "login") {
 				await logInWithEmail(email, password);
 				navigate("/");
 			} else {
 				// registration then login – depends on your backend
-				// await apiClient.post("/auth/register", { email, password, ... });
-				// await logInWithEmail(email, password);
+				await apiClient.post("/users/register", {
+					username,
+					email,
+					password,
+					role,
+				});
+				await logInWithEmail(email, password);
 			}
 		} catch (err: any) {
 			console.error(err);
@@ -39,22 +46,21 @@ function AuthPage() {
 		}
 	};
 
-    
-//   if (mode === "login") {
-//   await logInWithEmail(email, password);
-//   const stored = localStorage.getItem("peertrack_user");
-//   const user = stored ? JSON.parse(stored) : null;
+	//   if (mode === "login") {
+	//   await logInWithEmail(email, password);
+	//   const stored = localStorage.getItem("peertrack_user");
+	//   const user = stored ? JSON.parse(stored) : null;
 
-//   if (user?.role === "learner") {
-//     navigate(`/dashboard/learner`);
-//   } else if (user?.role === "alumni") {
-//     navigate(`/dashboard/alumni`);
-//   } else if (user?.role === "admin") {
-//     navigate(`/dashboard/admin`);
-//   } else {
-//     navigate("/");
-//   }
-// }
+	//   if (user?.role === "learner") {
+	//     navigate(`/dashboard/learner`);
+	//   } else if (user?.role === "alumni") {
+	//     navigate(`/dashboard/alumni`);
+	//   } else if (user?.role === "admin") {
+	//     navigate(`/dashboard/admin`);
+	//   } else {
+	//     navigate("/");
+	//   }
+	// }
 
 	return (
 		<div className="max-w-md mx-auto mt-10 bg-slate-900/80 border border-slate-700 rounded-xl p-6 shadow-lg">
@@ -73,6 +79,40 @@ function AuthPage() {
 			)}
 
 			<form onSubmit={handleSubmit} className="space-y-3">
+				{mode === "register" ? (
+					<>
+						<div>
+							<label className="block text-xs text-slate-300 mb-1">
+								Username
+							</label>
+							<input
+								type="text"
+								className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-1 focus:ring-sky-500"
+								value={username}
+								onChange={(e) => setUsername(e.target.value)}
+								required
+							/>
+						</div>
+						<div>
+							<label className="block text-xs text-slate-300 mb-1">
+								Register As
+							</label>
+							<select
+								className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-1 focus:ring-sky-500"
+								value={role}
+								onChange={(e) => setRole(e.target.value)}
+								required>
+								<option value="" hidden>
+									-- Select --
+								</option>
+								<option value="learner">Learner</option>
+								<option value="alumni">Alumni</option>
+							</select>
+						</div>
+					</>
+				) : (
+					""
+				)}
 				<div>
 					<label className="block text-xs text-slate-300 mb-1">Email</label>
 					<input
