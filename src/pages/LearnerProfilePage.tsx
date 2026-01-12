@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { apiClient } from "../clients/apiClient";
-// import SkillSelector from "../components/SkillSelector";
+// import { SkillSelector } from "../components/SkillSelector";
 
 type SessionType = "video" | "chat" | "both";
 

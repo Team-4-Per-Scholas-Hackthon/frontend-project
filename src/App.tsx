@@ -9,6 +9,7 @@ import LearnerDashboard from "./pages/LearnerDashboard";
 import type { JSX } from "react";
 import UserFormPage from "./pages/userFormPage";
 import LearnerProfilePage from "./pages/LearnerProfilePage";
+import AlumniProfilePage from "./pages/AlumniProfilePage";
 
 
 import LearnMorePage from "./pages/LearnMorePage";
@@ -42,7 +43,7 @@ function App() {
           <Route
             path="/dashboard/admin"
             element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <AdminDashboard />
               </ProtectedRoute>
             }
@@ -50,7 +51,7 @@ function App() {
           <Route
             path="/dashboard/alumni"
             element={
-              <ProtectedRoute allowedRoles={["ALUMNI"]}>
+              <ProtectedRoute allowedRoles={["alumni"]}>
                 <AlumniDashboard />
               </ProtectedRoute>
             }
@@ -69,6 +70,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["learner"]}>
                 <LearnerProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile/alumni"
+            element={
+              <ProtectedRoute allowedRoles={["alumni"]}>
+                <AlumniProfilePage />
               </ProtectedRoute>
             }
           />

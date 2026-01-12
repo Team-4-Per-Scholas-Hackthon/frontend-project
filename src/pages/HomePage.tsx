@@ -73,7 +73,7 @@ function HomePage() {
     to="/profile/learner"
     className="inline-block mt-1 px-3 py-1.5 rounded bg-emerald-500 hover:bg-emerald-600 text-xs text-white font-medium"
   >
-    Create your learner profile
+    Your Learner Profile
   </Link>
 </div>
 				<div className="bg-slate-800/60 border border-slate-700 rounded-lg p-4">
