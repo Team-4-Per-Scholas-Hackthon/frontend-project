@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import VirtualTutorChat from "../components/VirtualTutorChat";
+import TutorList from "../components/TutorList";
 
 function LearnerDashboard() {
-  const [searchSkill, setSearchSkill] = useState("");
-  const [searchCohort, setSearchCohort] = useState("");
+  const [showTutors, setShowTutors] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -20,54 +20,40 @@ function LearnerDashboard() {
         </Link>
       </div>
 
-      {/* Find a Tutor search */}
+      {/* Find a Tutor section */}
       <section className="bg-slate-800/70 border border-slate-700 rounded-lg p-4">
-        <h2 className="text-lg font-semibold text-sky-300 mb-2">
+        <h2 className="text-lg font-semibold text-sky-300 mb-3">
           Find a Tutor
         </h2>
-        <div className="grid md:grid-cols-3 gap-3 text-sm">
-          <div>
-            <label className="block text-xs text-slate-300 mb-1">
-              By skill
-            </label>
-            <input
-              className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-100"
-              placeholder="e.g. React, Python, Networking"
-              value={searchSkill}
-              onChange={(e) => setSearchSkill(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-slate-300 mb-1">
-              By cohort
-            </label>
-            <input
-              className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-100"
-              placeholder="e.g. 2025-RTT-54"
-              value={searchCohort}
-              onChange={(e) => setSearchCohort(e.target.value)}
-            />
-          </div>
-          <div className="flex items-end">
-            <button className="w-full px-3 py-2 rounded bg-sky-500 hover:bg-sky-600 text-xs font-medium">
-              Find Tutor (AI)
-            </button>
-          </div>
-        </div>
+        <button
+          onClick={() => setShowTutors(!showTutors)}
+          className="px-4 py-2 rounded bg-sky-500 hover:bg-sky-600 text-white text-sm font-medium"
+        >
+          {showTutors ? "Hide Tutors" : "Browse Available Tutors"}
+        </button>
       </section>
 
-      {/* Matched tutors + Virtual Tutor chat */}
+      {/* Tutor List */}
+      {showTutors && (
+        <section className="bg-slate-800/70 border border-slate-700 rounded-lg p-4">
+          <h2 className="text-lg font-semibold text-slate-100 mb-4">
+            Available Tutors
+          </h2>
+          <TutorList />
+        </section>
+      )}
+
+      {/* Virtual Tutor Chat */}
       <section className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2 bg-slate-800/70 border border-slate-700 rounded-lg p-4">
           <h2 className="text-lg font-semibold text-slate-100 mb-2">
-            Matched Tutors
+            Your Session Requests
           </h2>
           <p className="text-sm text-slate-300 mb-2">
-            AI will suggest tutors based on your skills, cohort, and recent
-            activity. You will be able to request sessions here.
+            Track your pending and upcoming tutoring sessions here.
           </p>
           <div className="mt-3 text-xs text-slate-500 italic">
-            Tutor cards will appear here after backend integration.
+            Your session requests will appear here.
           </div>
         </div>
 
