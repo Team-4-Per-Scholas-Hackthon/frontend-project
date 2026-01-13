@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import VirtualTutorChat from "../components/VirtualTutorChat";
 
 function LearnerDashboard() {
@@ -7,9 +8,17 @@ function LearnerDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-semibold text-emerald-300">
-        Learner Dashboard
-      </h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-semibold text-emerald-300">
+          Learner Dashboard
+        </h1>
+        <Link
+          to="/profile/learner"
+          className="px-4 py-2 rounded bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium transition-colors"
+        >
+          My Profile
+        </Link>
+      </div>
 
       {/* Find a Tutor search */}
       <section className="bg-slate-800/70 border border-slate-700 rounded-lg p-4">
@@ -69,5 +78,3 @@ function LearnerDashboard() {
 }
 
 export default LearnerDashboard;
-
-
