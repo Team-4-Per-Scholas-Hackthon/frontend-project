@@ -11,7 +11,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [role, setRole] = useState<"learner" | "alumni" | "">("");
-  const [mode, setMode] = useState<"login" | "register">("register");
+  const [mode, setMode] = useState<"login" | "register">("login");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
