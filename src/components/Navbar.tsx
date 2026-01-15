@@ -48,7 +48,7 @@ function Navbar() {
               to="/auth"
               className="text-sm px-3 py-1.5 rounded bg-sky-500 hover:bg-sky-600 text-white"
             >
-              Sign in
+              Log In
             </NavLink>
           )}
           {user && (
