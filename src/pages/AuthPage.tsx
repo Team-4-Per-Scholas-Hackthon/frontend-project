@@ -1,19 +1,24 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { apiClient } from "../clients/apiClient";
 
 function AuthPage() {
   const { logInWithEmail, logInWithProvider, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [role, setRole] = useState<"learner" | "alumni" | "">("");
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register">(
+    searchParams.get("mode") === "register" ? "register" : "login"
+  );
+  
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  
 
   if (user) {
     navigate("/");

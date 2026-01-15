@@ -313,7 +313,7 @@ function HomePage() {
 
                   {/* Primary CTA */}
                   <Link
-                    to="/auth"
+                    to="/auth?mode=register"
                     className="block w-full px-8 py-4 rounded-xl bg-gradient-to-r from-orange-500 via-pink-500 to-orange-600 hover:from-orange-600 hover:via-pink-600 hover:to-orange-700 text-white text-center font-bold text-lg transition-all shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-pink-500/40 mb-4"
                   >
                     Get Started Free
@@ -502,7 +502,7 @@ function HomePage() {
             Join the PeerTrack+ community and connect with mentors who've been exactly where you are.
           </p>
           <Link
-            to="/auth"
+            to="/auth?mode=register"
             className="inline-block px-10 py-5 rounded-xl bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 hover:from-orange-600 hover:via-pink-600 hover:to-purple-600 text-white font-bold text-xl transition-all shadow-2xl shadow-pink-500/30 hover:scale-105 hover:shadow-pink-500/50"
           >
             Get Started Free
