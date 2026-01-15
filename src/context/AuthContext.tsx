@@ -1,6 +1,8 @@
 import { createContext, useContext, useState } from "react";
 import type { AnyUser } from "../types";
 import { apiClient } from "../clients/apiClient";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextValue {
 	user: AnyUser | null;
@@ -31,6 +33,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		return localStorage.getItem("peertrack_token");
 	});
 
+	//navigation
+	const navigate = useNavigate();
+
 	const saveAuth = (userData: AnyUser, jwt: string) => {
 		setUser(userData);
 		setToken(jwt);
@@ -49,9 +54,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	};
 
 	const logInWithProvider = (provider: "github" | "google") => {
-		window.location.href = `${
-			import.meta.env.VITE_BACKEND_URL
-		}/users/auth/${provider}`;
+		const popup = window.open(
+			`${import.meta.env.VITE_BACKEND_URL}/users/auth/${provider}`,
+			"_blank",
+			"width=500,height=600"
+		);
+
+		// Listen for message from popup
+		window.addEventListener("message", (event) => {
+			//check to see if the message is coming from our backend
+			if (event.origin !== import.meta.env.VITE_BACKEND_URL) return;
+			//destructure the login
+			const { token, user } = event.data;
+			//save to the localStorage
+			saveAuth(user, token);
+			//navigate to home page
+			navigate("/");
+		});
 	};
 
 	const logOut = () => {
