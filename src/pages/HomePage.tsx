@@ -178,41 +178,499 @@
 
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useState, useEffect } from "react";
+import { apiClient } from "../clients/apiClient";
+
+interface Session {
+  id: string;
+  date: string;
+  time: string;
+  topic: string;
+  mentorName?: string;
+  learnerName?: string;
+  status: "accepted" | "pending" | "new_request";
+  duration: string;
+}
+
+interface LearnerStats {
+  sessionsAttended: number;
+  hoursLearned: number;
+  currentStreak: number;
+}
+
+interface AlumniStats {
+  learnersHelped: number;
+  sessionsCompleted: number;
+  badgesEarned: number;
+}
 
 function HomePage() {
   const { user } = useAuth();
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [learnerStats, setLearnerStats] = useState<LearnerStats | null>(null);
+  const [alumniStats, setAlumniStats] = useState<AlumniStats | null>(null);
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // If user is logged in, show personalized welcome
-  if (user) {
+  useEffect(() => {
+    if (user) {
+      fetchUserData();
+    }
+  }, [user]);
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
+      if (user?.role === "learner") {
+        const [sessionsRes, statsRes] = await Promise.all([
+          apiClient.get("/learner/sessions"),
+          apiClient.get("/learner/quick-stats")
+        ]);
+        setSessions(sessionsRes.data);
+        setLearnerStats(statsRes.data);
+      } else if (user?.role === "alumni") {
+        const [sessionsRes, statsRes] = await Promise.all([
+          apiClient.get("/alumni/sessions"),
+          apiClient.get("/alumni/quick-stats")
+        ]);
+        setSessions(sessionsRes.data);
+        setAlumniStats(statsRes.data);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ============================================
+  // LEARNER VIEW - Welcome Page with Calendar
+  // ============================================
+  if (user?.role === "learner") {
     return (
       <div className="min-h-[calc(100vh-200px)]">
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <div className="text-center mb-12 bg-slate-800/60 border border-orange-500/30 rounded-2xl p-12">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-orange-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent mb-4">
-              Welcome back, {user.fullName || user.username}! 👋
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* Welcome Header */}
+          <div className="text-center mb-8 bg-slate-800/60 border border-cyan-500/30 rounded-2xl p-8">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-3">
+              Welcome back, {user.fullName || user.username}! 🚀
             </h1>
-            <p className="text-xl text-slate-300 mb-8">
-              Ready to continue your learning journey?
+            <p className="text-lg text-slate-300 mb-6">
+              Keep up the great work on your learning journey!
             </p>
             <Link
-              to={
-                user.role === "learner"
-                  ? "/dashboard/learner"
-                  : user.role === "alumni"
-                  ? "/dashboard/alumni"
-                  : "/dashboard/admin"
-              }
-              className="inline-block px-8 py-4 rounded-lg bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-semibold text-lg transition-all shadow-lg"
+              to="/dashboard/learner"
+              className="inline-block px-8 py-4 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white font-semibold text-lg transition-all shadow-lg"
             >
-              Go to Dashboard →
+              Go to Full Dashboard →
             </Link>
           </div>
+
+          {/* Quick Stats */}
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <>
+              <div className="grid md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-slate-800/40 border border-cyan-500/30 rounded-xl p-6">
+                  <div className="text-3xl mb-2">📚</div>
+                  <div className="text-2xl font-bold text-cyan-400">{learnerStats?.sessionsAttended || 0}</div>
+                  <div className="text-sm text-slate-400">Sessions</div>
+                </div>
+                <div className="bg-slate-800/40 border border-purple-500/30 rounded-xl p-6">
+                  <div className="text-3xl mb-2">⏰</div>
+                  <div className="text-2xl font-bold text-purple-400">{learnerStats?.hoursLearned || 0}</div>
+                  <div className="text-sm text-slate-400">Hours Learned</div>
+                </div>
+                <div className="bg-slate-800/40 border border-orange-500/30 rounded-xl p-6">
+                  <div className="text-3xl mb-2">🔥</div>
+                  <div className="text-2xl font-bold text-orange-400">{learnerStats?.currentStreak || 0}</div>
+                  <div className="text-sm text-slate-400">Day Streak</div>
+                </div>
+                <div className="bg-slate-800/40 border border-pink-500/30 rounded-xl p-6">
+                  <div className="text-3xl mb-2">📈</div>
+                  <div className="text-2xl font-bold text-pink-400">85%</div>
+                  <div className="text-sm text-slate-400">Progress</div>
+                </div>
+              </div>
+
+              {/* Calendar */}
+              <div className="bg-slate-800/40 border border-slate-700 rounded-2xl p-8 mb-8">
+                <h2 className="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-2">
+                  <span>📅</span> Your Schedule
+                </h2>
+                
+                <div className="grid grid-cols-7 gap-2 mb-4">
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                    <div key={day} className="text-center text-sm font-semibold text-slate-400 py-2">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="space-y-2">
+                  {/* Week 1 */}
+                  <div className="grid grid-cols-7 gap-2">
+                    <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-center text-slate-400">
+                      <div className="text-lg font-semibold">1</div>
+                    </div>
+                    <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-center text-slate-400">
+                      <div className="text-lg font-semibold">2</div>
+                    </div>
+                    <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-center text-slate-400">
+                      <div className="text-lg font-semibold">3</div>
+                    </div>
+                    {/* ACCEPTED Session */}
+                    <div 
+                      onClick={() => setSelectedSession({
+                        id: "1",
+                        date: "Jan 4",
+                        time: "3:00 PM",
+                        topic: "JavaScript Basics",
+                        mentorName: "John Smith",
+                        status: "accepted",
+                        duration: "60 min"
+                      })}
+                      className="bg-gradient-to-br from-emerald-900/40 to-cyan-900/40 border-2 border-emerald-500/50 rounded-lg p-3 cursor-pointer hover:scale-105 transition-all relative overflow-hidden shadow-lg"
+                    >
+                      <div className="text-lg font-semibold text-emerald-300">4</div>
+                      <div className="text-xs text-emerald-200">3:00 PM</div>
+                      <div className="text-xs text-emerald-300 font-semibold">✓ Confirmed</div>
+                    </div>
+                    <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-center text-slate-400">
+                      <div className="text-lg font-semibold">5</div>
+                    </div>
+                    <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-center text-slate-400">
+                      <div className="text-lg font-semibold">6</div>
+                    </div>
+                    {/* PENDING Session */}
+                    <div 
+                      onClick={() => setSelectedSession({
+                        id: "2",
+                        date: "Jan 7",
+                        time: "5:00 PM",
+                        topic: "Python Review",
+                        mentorName: "Sarah Johnson",
+                        status: "pending",
+                        duration: "45 min"
+                      })}
+                      className="bg-gradient-to-br from-yellow-900/40 to-orange-900/40 border-2 border-yellow-500/50 rounded-lg p-3 cursor-pointer hover:scale-105 transition-all relative overflow-hidden shadow-lg"
+                    >
+                      <div className="text-lg font-semibold text-yellow-300">7</div>
+                      <div className="text-xs text-yellow-200">5:00 PM</div>
+                      <div className="text-xs text-yellow-300 font-semibold animate-pulse">⏳ Pending</div>
+                    </div>
+                  </div>
+
+                  {/* Week 2 */}
+                  <div className="grid grid-cols-7 gap-2">
+                    {[8, 9, 10, 11, 12, 13, 14].map((day) => (
+                      <div key={day} className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-center text-slate-400">
+                        <div className="text-lg font-semibold">{day}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <div className="mt-6 flex items-center justify-center gap-6 pt-4 border-t border-slate-700">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-gradient-to-br from-emerald-500/40 to-cyan-500/40 border border-emerald-500/50 rounded"></div>
+                    <span className="text-sm text-slate-400">Accepted</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-gradient-to-br from-yellow-500/40 to-orange-500/40 border border-yellow-500/50 rounded"></div>
+                    <span className="text-sm text-slate-400">Pending</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-slate-900/50 border border-slate-700 rounded"></div>
+                    <span className="text-sm text-slate-400">Available</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Growth Indicators Mini */}
+              <div className="bg-slate-800/40 border border-slate-700 rounded-2xl p-8">
+                <h3 className="text-xl font-bold text-slate-100 mb-4">📈 Skills Progress</h3>
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-slate-300">JavaScript</span>
+                      <span className="text-cyan-400">12/20 hrs</span>
+                    </div>
+                    <div className="h-2 bg-slate-900/60 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full" style={{width: '60%'}}></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-slate-300">React</span>
+                      <span className="text-pink-400">8/15 hrs</span>
+                    </div>
+                    <div className="h-2 bg-slate-900/60 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-pink-500 to-orange-500 rounded-full" style={{width: '53%'}}></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
+
+        {/* Session Detail Modal */}
+        {selectedSession && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setSelectedSession(null)}>
+            <div className="bg-slate-800 border border-cyan-500/50 rounded-2xl p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-2xl font-bold text-cyan-400 mb-4">{selectedSession.topic}</h3>
+              <div className="space-y-3 text-slate-300">
+                <p>📅 {selectedSession.date} at {selectedSession.time}</p>
+                <p>👨‍🏫 Mentor: {selectedSession.mentorName}</p>
+                <p>⏱️ Duration: {selectedSession.duration}</p>
+                <p>
+                  Status: 
+                  <span className={`ml-2 px-3 py-1 rounded-full text-xs font-semibold ${
+                    selectedSession.status === 'accepted' 
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                      : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40'
+                  }`}>
+                    {selectedSession.status === 'accepted' ? '✓ Confirmed' : '⏳ Waiting for confirmation'}
+                  </span>
+                </p>
+                {selectedSession.status === 'accepted' && (
+                  <a href="#" className="inline-block mt-4 px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg font-semibold">
+                    Join Session →
+                  </a>
+                )}
+              </div>
+              <button onClick={() => setSelectedSession(null)} className="mt-6 text-slate-400 hover:text-slate-200">Close</button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
-  // Landing page for non-logged-in users
+  // ============================================
+  // ALUMNI VIEW - Welcome Page with Calendar
+  // ============================================
+  if (user?.role === "alumni") {
+    return (
+      <div className="min-h-[calc(100vh-200px)]">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* Welcome Header */}
+          <div className="text-center mb-8 bg-slate-800/60 border border-orange-500/30 rounded-2xl p-8">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent mb-3">
+              Welcome back, {user.fullName || user.username}! 👋
+            </h1>
+            <p className="text-lg text-slate-300 mb-6">
+              Ready to help more learners grow?
+            </p>
+            <Link
+              to="/dashboard/alumni"
+              className="inline-block px-8 py-4 rounded-lg bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-semibold text-lg transition-all shadow-lg"
+            >
+              Go to Full Dashboard →
+            </Link>
+          </div>
+
+          {/* Quick Stats */}
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <>
+              <div className="grid md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-slate-800/40 border border-cyan-500/30 rounded-xl p-6">
+                  <div className="text-3xl mb-2">👥</div>
+                  <div className="text-2xl font-bold text-cyan-400">{alumniStats?.learnersHelped || 0}</div>
+                  <div className="text-sm text-slate-400">Learners Helped</div>
+                </div>
+                <div className="bg-slate-800/40 border border-orange-500/30 rounded-xl p-6">
+                  <div className="text-3xl mb-2">✅</div>
+                  <div className="text-2xl font-bold text-orange-400">{alumniStats?.sessionsCompleted || 0}</div>
+                  <div className="text-sm text-slate-400">Sessions Done</div>
+                </div>
+                <div className="bg-slate-800/40 border border-yellow-500/30 rounded-xl p-6">
+                  <div className="text-3xl mb-2">🏆</div>
+                  <div className="text-2xl font-bold text-yellow-400">{alumniStats?.badgesEarned || 0}</div>
+                  <div className="text-sm text-slate-400">Badges Earned</div>
+                </div>
+                <div className="bg-slate-800/40 border border-pink-500/30 rounded-xl p-6">
+                  <div className="text-3xl mb-2">⭐</div>
+                  <div className="text-2xl font-bold text-pink-400">4.9</div>
+                  <div className="text-sm text-slate-400">Rating</div>
+                </div>
+              </div>
+
+              {/* Calendar */}
+              <div className="bg-slate-800/40 border border-slate-700 rounded-2xl p-8 mb-8">
+                <h2 className="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-2">
+                  <span>📅</span> Your Schedule
+                </h2>
+                
+                <div className="grid grid-cols-7 gap-2 mb-4">
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                    <div key={day} className="text-center text-sm font-semibold text-slate-400 py-2">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="space-y-2">
+                  {/* Week 1 */}
+                  <div className="grid grid-cols-7 gap-2">
+                    <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-center text-slate-400">
+                      <div className="text-lg font-semibold">1</div>
+                    </div>
+                    {/* NEW REQUEST - Pulsing */}
+                    <div 
+                      onClick={() => setSelectedSession({
+                        id: "1",
+                        date: "Jan 2",
+                        time: "2:00 PM",
+                        topic: "React Hooks Help",
+                        learnerName: "Alex Chen",
+                        status: "new_request",
+                        duration: "30 min"
+                      })}
+                      className="bg-gradient-to-br from-orange-900/50 to-red-900/50 border-2 border-orange-500/70 rounded-lg p-3 cursor-pointer hover:scale-105 transition-all relative overflow-hidden shadow-lg animate-pulse"
+                    >
+                      <div className="text-lg font-semibold text-orange-300">2</div>
+                      <div className="text-xs text-orange-200">2:00 PM</div>
+                      <div className="text-xs text-orange-300 font-semibold">🔔 New!</div>
+                      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-red-500/20"></div>
+                    </div>
+                    <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-center text-slate-400">
+                      <div className="text-lg font-semibold">3</div>
+                    </div>
+                    {/* SCHEDULED Session */}
+                    <div 
+                      onClick={() => setSelectedSession({
+                        id: "2",
+                        date: "Jan 4",
+                        time: "4:00 PM",
+                        topic: "JavaScript Debugging",
+                        learnerName: "Maria Lopez",
+                        status: "accepted",
+                        duration: "60 min"
+                      })}
+                      className="bg-gradient-to-br from-cyan-900/40 to-purple-900/40 border-2 border-cyan-500/50 rounded-lg p-3 cursor-pointer hover:scale-105 transition-all relative overflow-hidden shadow-lg"
+                    >
+                      <div className="text-lg font-semibold text-cyan-300">4</div>
+                      <div className="text-xs text-cyan-200">4:00 PM</div>
+                      <div className="text-xs text-cyan-300 font-semibold">✓ Scheduled</div>
+                    </div>
+                    <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-center text-slate-400">
+                      <div className="text-lg font-semibold">5</div>
+                    </div>
+                    <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-center text-slate-400">
+                      <div className="text-lg font-semibold">6</div>
+                    </div>
+                    <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-center text-slate-400">
+                      <div className="text-lg font-semibold">7</div>
+                    </div>
+                  </div>
+
+                  {/* Week 2 */}
+                  <div className="grid grid-cols-7 gap-2">
+                    {[8, 9, 10, 11, 12, 13, 14].map((day) => (
+                      <div key={day} className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-center text-slate-400">
+                        <div className="text-lg font-semibold">{day}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <div className="mt-6 flex items-center justify-center gap-6 pt-4 border-t border-slate-700">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-gradient-to-br from-orange-500/50 to-red-500/50 border border-orange-500/70 rounded animate-pulse"></div>
+                    <span className="text-sm text-slate-400">New Request</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-gradient-to-br from-cyan-500/40 to-purple-500/40 border border-cyan-500/50 rounded"></div>
+                    <span className="text-sm text-slate-400">Scheduled</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-slate-900/50 border border-slate-700 rounded"></div>
+                    <span className="text-sm text-slate-400">Available</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Badges */}
+              <div className="bg-slate-800/40 border border-slate-700 rounded-2xl p-8">
+                <h3 className="text-xl font-bold text-slate-100 mb-4 flex items-center gap-2">
+                  <span>🏆</span> Recent Badges
+                </h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-slate-900/60 border border-orange-500/30 rounded-xl p-4 text-center">
+                    <div className="text-4xl mb-2">🥇</div>
+                    <div className="text-xs font-semibold text-orange-300">First Session</div>
+                  </div>
+                  <div className="bg-slate-900/60 border border-cyan-500/30 rounded-xl p-4 text-center">
+                    <div className="text-4xl mb-2">⭐</div>
+                    <div className="text-xs font-semibold text-cyan-300">5-Star Mentor</div>
+                  </div>
+                  <div className="bg-slate-900/60 border border-pink-500/30 rounded-xl p-4 text-center">
+                    <div className="text-4xl mb-2">🔥</div>
+                    <div className="text-xs font-semibold text-pink-300">Weekly Streak</div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Session Detail Modal */}
+        {selectedSession && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setSelectedSession(null)}>
+            <div className="bg-slate-800 border border-orange-500/50 rounded-2xl p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-2xl font-bold text-orange-400 mb-4">{selectedSession.topic}</h3>
+              <div className="space-y-3 text-slate-300">
+                <p>📅 {selectedSession.date} at {selectedSession.time}</p>
+                <p>👨‍💻 Learner: {selectedSession.learnerName}</p>
+                <p>⏱️ Duration: {selectedSession.duration}</p>
+                <p>
+                  Status: 
+                  <span className={`ml-2 px-3 py-1 rounded-full text-xs font-semibold ${
+                    selectedSession.status === 'new_request'
+                      ? 'bg-orange-500/20 text-orange-300 border border-orange-500/40 animate-pulse'
+                      : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                  }`}>
+                    {selectedSession.status === 'new_request' ? '🔔 New Request' : '✓ Scheduled'}
+                  </span>
+                </p>
+                {selectedSession.status === 'new_request' && (
+                  <div className="flex gap-3 mt-4">
+                    <button className="flex-1 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold">
+                      Accept
+                    </button>
+                    <button className="flex-1 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg">
+                      Decline
+                    </button>
+                  </div>
+                )}
+                {selectedSession.status === 'accepted' && (
+                  <a href="#" className="inline-block mt-4 px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg font-semibold">
+                    View Details →
+                  </a>
+                )}
+              </div>
+              <button onClick={() => setSelectedSession(null)} className="mt-6 text-slate-400 hover:text-slate-200">Close</button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ============================================
+  // LANDING PAGE - Your Original Beautiful Design
+  // ============================================
   return (
     <div className="space-y-0">
       {/* Hero Section - Split Screen */}
