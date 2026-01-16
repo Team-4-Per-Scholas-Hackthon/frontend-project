@@ -44,8 +44,8 @@ function LearnerDashboard() {
       )}
 
       {/* Virtual Tutor Chat */}
-      <section className="grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-slate-800/70 border border-slate-700 rounded-lg p-4">
+      <section className="grid grid-cols-3 gap-6">
+        <div className="col-span-2 bg-slate-800/70 border border-slate-700 rounded-lg p-4">
           <h2 className="text-lg font-semibold text-slate-100 mb-2">
             Your Session Requests
           </h2>
