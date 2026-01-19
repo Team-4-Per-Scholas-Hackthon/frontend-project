@@ -10,7 +10,8 @@ import type { JSX } from "react";
 import UserFormPage from "./pages/userFormPage";
 import LearnerProfilePage from "./pages/LearnerProfilePage";
 import AlumniProfilePage from "./pages/AlumniProfilePage";
-
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 import LearnMorePage from "./pages/LearnMorePage";
 
@@ -39,7 +40,8 @@ function App() {
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/learn-more" element={<LearnMorePage />} />
           <Route path="/userform" element={<UserFormPage />} />
-
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route
             path="/dashboard/admin"
             element={

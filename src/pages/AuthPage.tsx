@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { apiClient } from "../clients/apiClient";
 
@@ -357,6 +357,14 @@ function AuthPage() {
                       >
                         {loading ? "Signing In..." : "Sign In"}
                       </button>
+                      <div className="mt-3 text-center">
+                        <Link
+                          to="/forgot-password"
+                          className="text-xs text-slate-400 hover:text-slate-200 underline underline-offset-4"
+                        >
+                          Forgot your password?
+                        </Link>
+                      </div>
                     </form>
 
                     {/* OAuth - Only on Login */}
