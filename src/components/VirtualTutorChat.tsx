@@ -4,7 +4,9 @@ import { sendQueryToGemini } from "../utilities/gemini";
 
 function VirtualTutorChat() {
   const [text, setText] = useState("");
-  const [response, setResponse] = useState("Hello, I am your virtual tutor.");
+  const [response, setResponse] = useState(
+    "Hello! I’m your virtual tutor. Ask me anything about your learning path."
+  );
   const [loading, setLoading] = useState(false);
 
   const handleButtonClick = async () => {
@@ -13,41 +15,60 @@ function VirtualTutorChat() {
     setLoading(true);
     try {
       const result = await sendQueryToGemini(text);
-      setResponse(result || "No response received");
+      setResponse(result || "No response received.");
       setText("");
     } catch (error) {
       console.error(error);
-      setResponse("Error: Failed to get response");
+      setResponse("Error: Failed to get response.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-slate-800/60 border border-slate-700 rounded-xl shadow-lg p-4 w-full">
-      <h2 className="text-emerald-300 font-semibold text-sm mb-3 text-center">
-        Virtual Tutor Chat
-      </h2>
+    <div className="relative rounded-2xl p-[1px] bg-gradient-to-br from-purple-500/40 via-pink-500/25 to-cyan-500/30">
+      <div className="rounded-2xl bg-slate-900/85 backdrop-blur border border-slate-800 shadow-lg p-4 w-full">
+        {/* Header */}
+        <h2 className="text-center text-sm font-semibold mb-3 bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
+          Virtual Tutor Chat
+        </h2>
 
-      <div className="bg-slate-900/40 border border-slate-700 rounded-lg p-3 mb-3 text-xs min-h-[80px]">
-        {loading ? "Loading the response..." : response}
-      </div>
+        {/* Response */}
+        <div className="relative mb-3 rounded-lg bg-slate-950/70 border border-slate-800 p-3 text-xs text-slate-200 min-h-[90px]">
+          {loading ? (
+            <span className="animate-pulse text-cyan-300">
+              Thinking…
+            </span>
+          ) : (
+            response
+          )}
+        </div>
 
-      <div className="flex flex-col space-y-2">
-        <textarea
-          className="bg-slate-900/40 border border-slate-700 rounded-lg p-2 text-slate-200 text-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-          placeholder="Type your question here..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          disabled={loading}
-        />
-        <button
-          onClick={handleButtonClick}
-          disabled={loading}
-          className="bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-900 font-semibold py-1.5 px-3 rounded-lg text-xs transition-colors"
-        >
-          Submit
-        </button>
+        {/* Input */}
+        <div className="flex flex-col space-y-2">
+          <textarea
+            className="bg-slate-950/70 border border-slate-800 rounded-lg p-2 text-slate-200 text-xs placeholder-slate-400
+                       focus:outline-none focus:ring-2 focus:ring-cyan-400/30
+                       transition disabled:opacity-60"
+            placeholder="Type your question here..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            disabled={loading}
+          />
+
+          {/* Submit */}
+          <button
+            onClick={handleButtonClick}
+            disabled={loading}
+            className="rounded-lg py-1.5 px-3 text-xs font-semibold text-white
+                       bg-gradient-to-r from-purple-500 to-fuchsia-500
+                       hover:scale-105
+                       hover:shadow-[0_0_25px_rgba(168,139,250,0.6)]
+                       transition-all disabled:opacity-50"
+          >
+            {loading ? "Submitting…" : "Ask Tutor"}
+          </button>
+        </div>
       </div>
     </div>
   );
