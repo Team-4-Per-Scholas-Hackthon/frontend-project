@@ -81,7 +81,6 @@ function AlumniDashboard() {
   const handleAccept = async (requestId: string) => {
     try {
       await apiClient.patch(`/requests/${requestId}/accept`);
-      // Refresh requests
       const res = await apiClient.get("/requests");
       setRequests(res.data);
     } catch (err: any) {
@@ -93,7 +92,6 @@ function AlumniDashboard() {
   const handleDecline = async (requestId: string) => {
     try {
       await apiClient.patch(`/requests/${requestId}/decline`);
-      // Refresh requests
       const res = await apiClient.get("/requests");
       setRequests(res.data);
     } catch (err: any) {
@@ -110,41 +108,60 @@ function AlumniDashboard() {
       weekday: "short",
       month: "short",
       day: "numeric",
-      year: "numeric",
     });
   };
 
   const pendingRequests = requests.filter((r) => r.status === "OPEN");
   const acceptedRequests = requests.filter((r) => r.status === "ACCEPTED");
-  const pastRequests = requests.filter((r) => ["DECLINED", "CANCELLED", "COMPLETED"].includes(r.status));
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-semibold text-sky-300">
-          Welcome back, {user.fullName || user.username}
-        </h1>
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
+            Alumni Dashboard
+          </h1>
+          <p className="text-slate-400 text-sm mt-1">
+            Welcome back, {user.fullName || user.username}! 👋
+          </p>
+        </div>
         <Link
           to="/profile/alumni"
-          className="px-4 py-2 rounded bg-sky-500 hover:bg-sky-600 text-white text-sm font-medium transition-colors"
+          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white text-sm font-semibold transition-all shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-105"
         >
           Edit Profile
         </Link>
       </div>
 
-      {/* Pending Requests */}
-      <section className="bg-slate-800/70 border border-slate-700 rounded-lg p-4">
-        <h2 className="text-lg font-semibold text-amber-300 mb-3">
-          Pending Session Requests ({pendingRequests.length})
-        </h2>
-        
+      {/* Pending Requests - Compact Section */}
+      <section className="bg-gradient-to-br from-orange-900/20 to-slate-800/50 border border-orange-500/40 rounded-2xl p-5 relative overflow-hidden">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 bg-gradient-to-br from-orange-500/40 to-red-500/40 rounded-lg flex items-center justify-center border border-orange-400/50 shadow-lg shadow-orange-500/20">
+            <span className="text-xl">{pendingRequests.length > 0 ? '🔔' : '📭'}</span>
+          </div>
+          <div className="flex-1">
+            <h2 className="text-lg font-bold text-orange-300">
+              Pending Requests
+            </h2>
+            <p className="text-xs text-slate-400">
+              {pendingRequests.length} request{pendingRequests.length !== 1 ? 's' : ''} waiting
+            </p>
+          </div>
+          {pendingRequests.length > 0 && (
+            <span className="px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 text-xs font-bold border border-orange-500/40 animate-pulse">
+              {pendingRequests.length} NEW
+            </span>
+          )}
+        </div>
+
         {requestsLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-500" />
+          <div className="flex items-center justify-center py-6">
+            <div className="w-8 h-8 border-3 border-orange-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : pendingRequests.length === 0 ? (
-          <p className="text-sm text-slate-400 italic">
-            No pending requests at the moment.
+          <p className="text-sm text-slate-400 text-center py-4">
+            No pending requests at the moment
           </p>
         ) : (
           <div className="space-y-3">
@@ -156,54 +173,42 @@ function AlumniDashboard() {
               return (
                 <div
                   key={request._id}
-                  className="bg-slate-900/50 border border-slate-700 rounded-lg p-4"
+                  className="bg-slate-900/60 border border-orange-500/30 rounded-xl p-4 hover:border-orange-500/50 transition-all"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <h3 className="font-semibold text-emerald-300">
-                        {request.title}
-                      </h3>
-                      <p className="text-sm text-slate-400">
-                        from {learnerName}
+                      <h3 className="font-semibold text-orange-200">{request.title}</h3>
+                      <p className="text-xs text-slate-400">
+                        from <span className="text-cyan-400">{learnerName}</span>
                         {request.learnerId.cohort && ` • ${request.learnerId.cohort}`}
                       </p>
                     </div>
-                    <span className="px-2 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs border border-amber-500/40">
-                      {request.status}
-                    </span>
                   </div>
 
                   <div className="text-sm text-slate-300 mb-2">
                     <span className="text-slate-400">Topic:</span> {request.topic}
                   </div>
 
-                  {request.description && (
-                    <p className="text-sm text-slate-300 mb-3">
-                      {request.description}
-                    </p>
-                  )}
-
-                  <div className="flex flex-wrap gap-3 text-xs text-slate-400 mb-3">
+                  <div className="flex flex-wrap gap-2 text-xs text-slate-400 mb-3">
                     {request.preferredDate && (
-                      <span>📅 {formatDate(request.preferredDate)}</span>
+                      <span className="bg-slate-800/60 px-2 py-1 rounded-full">📅 {formatDate(request.preferredDate)}</span>
                     )}
-                    {request.preferredTime && (
-                      <span>🕐 {request.preferredTime}</span>
-                    )}
-                    <span>⏱️ {request.duration} min</span>
-                    <span className="capitalize">📹 {request.sessionType}</span>
+                    <span className="bg-slate-800/60 px-2 py-1 rounded-full">⏱️ {request.duration} min</span>
+                    <span className="bg-slate-800/60 px-2 py-1 rounded-full capitalize">
+                      {request.sessionType === 'video' ? '📹' : '💬'} {request.sessionType}
+                    </span>
                   </div>
 
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleAccept(request._id)}
-                      className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white text-sm py-2 rounded font-medium"
+                      className="flex-1 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white py-2 rounded-lg font-semibold text-sm transition-all shadow-lg shadow-emerald-500/20"
                     >
-                      Accept
+                      ✓ Accept
                     </button>
                     <button
                       onClick={() => handleDecline(request._id)}
-                      className="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm py-2 rounded"
+                      className="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 py-2 rounded-lg text-sm transition-all"
                     >
                       Decline
                     </button>
@@ -215,13 +220,18 @@ function AlumniDashboard() {
         )}
       </section>
 
-      {/* Accepted/Upcoming Sessions */}
+      {/* Upcoming Sessions - Cyan/Purple Gradient */}
       {acceptedRequests.length > 0 && (
-        <section className="bg-slate-800/70 border border-slate-700 rounded-lg p-4">
-          <h2 className="text-lg font-semibold text-emerald-300 mb-3">
-            Upcoming Sessions ({acceptedRequests.length})
-          </h2>
-          <div className="space-y-2">
+        <section className="bg-gradient-to-br from-cyan-900/20 to-purple-900/20 border border-cyan-500/30 rounded-2xl p-5 hover:border-cyan-400/50 transition-all">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-lg flex items-center justify-center border border-cyan-400/30 shadow-lg shadow-cyan-500/20">
+              <span className="text-xl">📅</span>
+            </div>
+            <h2 className="text-lg font-bold text-cyan-300">
+              Upcoming Sessions ({acceptedRequests.length})
+            </h2>
+          </div>
+          <div className="space-y-3">
             {acceptedRequests.map((request) => {
               const learnerName = request.learnerId.firstname || request.learnerId.lastname
                 ? `${request.learnerId.firstname || ""} ${request.learnerId.lastname || ""}`.trim()
@@ -230,19 +240,15 @@ function AlumniDashboard() {
               return (
                 <div
                   key={request._id}
-                  className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 flex items-center justify-between"
+                  className="bg-slate-900/50 border border-cyan-500/20 rounded-xl p-4 flex items-center justify-between hover:border-cyan-500/40 transition-all"
                 >
                   <div>
-                    <h4 className="font-medium text-slate-200">
-                      {request.title}
-                    </h4>
-                    <p className="text-xs text-slate-400">
-                      with {learnerName} • {request.topic}
-                    </p>
+                    <h4 className="font-semibold text-cyan-300">{request.title}</h4>
+                    <p className="text-sm text-slate-400">with {learnerName} • {request.topic}</p>
                   </div>
-                  <span className="px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs border border-emerald-500/40">
-                    ACCEPTED
-                  </span>
+                  <button className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white rounded-lg text-sm font-semibold transition-all shadow-lg shadow-cyan-500/25 hover:scale-105">
+                    Start →
+                  </button>
                 </div>
               );
             })}
@@ -250,34 +256,42 @@ function AlumniDashboard() {
         </section>
       )}
 
+      {/* Main Content Grid */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-500" />
+          <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Profile Section */}
-          <section className="md:col-span-2 bg-slate-800/70 border border-slate-700 rounded-lg p-4 space-y-4">
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Profile Section - Orange Accents */}
+          <section className="lg:col-span-2 bg-slate-800/40 border border-slate-700 rounded-2xl p-6 space-y-5 hover:border-orange-500/30 transition-all">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-emerald-300">
-                Your Tutor Profile
-              </h2>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-500/30 to-pink-500/30 rounded-lg flex items-center justify-center border border-orange-400/30 shadow-lg shadow-orange-500/20">
+                  <span className="text-xl">🎓</span>
+                </div>
+                <h2 className="text-lg font-bold text-orange-300">Your Tutor Profile</h2>
+              </div>
+              <Link
+                to="/profile/alumni"
+                className="text-sm text-cyan-400 hover:text-cyan-300 font-medium transition-colors"
+              >
+                Edit →
+              </Link>
             </div>
 
             {/* About Me */}
             <div>
-              <h3 className="text-xs font-semibold text-slate-400 uppercase mb-2">
-                About Me
-              </h3>
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">About Me</h3>
               {profile?.bio ? (
-                <p className="text-sm text-slate-200 leading-relaxed">
+                <p className="text-sm text-slate-200 leading-relaxed bg-slate-900/30 rounded-xl p-4 border border-slate-700">
                   {profile.bio}
                 </p>
               ) : (
-                <p className="text-sm text-slate-400 italic">
+                <p className="text-sm text-slate-400 italic bg-slate-900/30 rounded-xl p-4 border border-slate-700 border-dashed">
                   No bio added yet.{" "}
-                  <Link to="/profile/alumni" className="text-sky-400 hover:underline">
-                    Add one now
+                  <Link to="/profile/alumni" className="text-orange-400 hover:text-orange-300 font-medium">
+                    Add one now →
                   </Link>
                 </p>
               )}
@@ -286,24 +300,22 @@ function AlumniDashboard() {
             {/* Cohort */}
             {profile?.cohort && (
               <div>
-                <h3 className="text-xs font-semibold text-slate-400 uppercase mb-1">
-                  Cohort
-                </h3>
-                <p className="text-sm text-slate-200">{profile.cohort}</p>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Cohort</h3>
+                <span className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-300 text-sm font-medium border border-purple-500/40">
+                  {profile.cohort}
+                </span>
               </div>
             )}
 
-            {/* Skills */}
+            {/* Skills - Cyan Tags */}
             <div>
-              <h3 className="text-xs font-semibold text-slate-400 uppercase mb-2">
-                Skills
-              </h3>
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Skills You Teach</h3>
               <div className="flex flex-wrap gap-2">
                 {profile?.skills && profile.skills.length > 0 ? (
                   profile.skills.map((skill, idx) => (
                     <span
                       key={idx}
-                      className="px-3 py-1 rounded-full bg-sky-500/20 text-sky-200 text-xs border border-sky-500/40"
+                      className="px-3 py-1.5 rounded-full bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-cyan-300 text-sm font-medium border border-cyan-500/30 hover:border-cyan-500/50 transition-all"
                     >
                       {skill}
                     </span>
@@ -311,8 +323,8 @@ function AlumniDashboard() {
                 ) : (
                   <p className="text-sm text-slate-400 italic">
                     No skills listed yet.{" "}
-                    <Link to="/profile/alumni" className="text-sky-400 hover:underline">
-                      Add your skills
+                    <Link to="/profile/alumni" className="text-orange-400 hover:text-orange-300 font-medium">
+                      Add your skills →
                     </Link>
                   </p>
                 )}
@@ -321,59 +333,92 @@ function AlumniDashboard() {
 
             {/* Availability */}
             <div>
-              <h3 className="text-xs font-semibold text-slate-400 uppercase mb-2">
-                Availability
-              </h3>
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Your Availability</h3>
               {profile?.availability && profile.availability.length > 0 ? (
                 <div className="space-y-2">
                   {profile.availability.map((slot) => (
                     <div
                       key={slot._id}
-                      className="flex items-center gap-3 text-sm bg-slate-900/50 border border-slate-700 rounded px-3 py-2"
+                      className="flex items-center justify-between bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2 hover:border-emerald-500/30 transition-all"
                     >
-                      <div className="flex-1">
-                        <span className="text-emerald-300 font-medium">
-                          {formatDate(slot.date)}
-                        </span>
-                      </div>
-                      <div className="text-slate-300">
+                      <span className="text-emerald-300 font-medium text-sm">{formatDate(slot.date)}</span>
+                      <span className="text-slate-300 bg-slate-800 px-3 py-1 rounded-full text-xs border border-slate-700">
                         {slot.startTime} - {slot.endTime}
-                      </div>
+                      </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-slate-400 italic">
+                <p className="text-sm text-slate-400 italic bg-slate-900/30 rounded-xl p-4 border border-slate-700 border-dashed">
                   No availability set.{" "}
-                  <Link to="/profile/alumni" className="text-sky-400 hover:underline">
-                    Add your availability
+                  <Link to="/profile/alumni" className="text-orange-400 hover:text-orange-300 font-medium">
+                    Add your availability →
                   </Link>
                 </p>
               )}
             </div>
           </section>
 
-          {/* AI Tutor Assistant */}
-          <section className="bg-slate-800/70 border border-slate-700 rounded-lg p-4">
-            <h2 className="text-lg font-semibold text-violet-300 mb-2">
-              AI Tutor Assistant
-            </h2>
-            <p className="text-xs text-slate-300 mb-2">
-              Ask AI for topic refreshers, quiz ideas, or explanations you can
-              use during sessions.
-            </p>
-            <div className="h-32 mb-2 rounded bg-slate-900/80 border border-slate-700 text-xs text-slate-300 p-2 overflow-y-auto">
-              <p className="text-slate-500 italic">
-                Chat history will appear here.
+          {/* AI Assistant Sidebar - Purple/Pink Gradient */}
+          <section className="lg:col-span-1 bg-gradient-to-br from-purple-900/20 to-slate-800/50 border border-purple-500/30 rounded-2xl p-5 hover:border-purple-400/50 transition-all relative overflow-hidden">
+            <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-2xl"></div>
+            
+            <div className="flex items-center gap-3 mb-4 relative z-10">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-lg flex items-center justify-center border border-purple-400/30 shadow-lg shadow-purple-500/20 animate-pulse">
+                <span className="text-xl">🤖</span>
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-purple-300">AI Assistant</h2>
+                <p className="text-xs text-slate-400">Topic refreshers & quiz ideas</p>
+              </div>
+            </div>
+            
+            <div className="h-40 mb-3 rounded-xl bg-slate-900/60 border border-purple-500/20 text-sm text-slate-300 p-3 overflow-y-auto relative z-10">
+              <p className="text-slate-500 italic text-center mt-12 text-xs">
+                💡 Ask for explanations or teaching tips!
               </p>
             </div>
-            <input
-              className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-100"
-              placeholder="Ask AI: Give me a quick JS closure explanation for beginners"
-            />
+            
+            <div className="relative z-10">
+              <input
+                className="w-full rounded-lg border border-purple-500/30 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500/60 transition-colors pr-10"
+                placeholder="Ask AI..."
+              />
+              <button className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-gradient-to-r from-purple-500 to-pink-500 rounded-md flex items-center justify-center text-white text-sm hover:from-purple-600 hover:to-pink-600 transition-all">
+                →
+              </button>
+            </div>
           </section>
         </div>
       )}
+
+      {/* Badges Section - Yellow/Orange Theme */}
+      <section className="bg-slate-800/40 border border-yellow-500/30 rounded-2xl p-5 hover:border-yellow-400/50 transition-all">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-10 h-10 bg-gradient-to-br from-yellow-500/30 to-orange-500/30 rounded-lg flex items-center justify-center border border-yellow-400/30 shadow-lg shadow-yellow-500/20">
+            <span className="text-xl">🏆</span>
+          </div>
+          <h2 className="text-lg font-bold text-yellow-300">Your Badges</h2>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="bg-slate-900/60 border border-orange-500/30 rounded-xl p-3 text-center hover:border-orange-500/50 transition-all hover:scale-105">
+            <div className="text-3xl mb-1">🥇</div>
+            <div className="text-xs font-semibold text-orange-300">First Session</div>
+          </div>
+          <div className="bg-slate-900/60 border border-cyan-500/30 rounded-xl p-3 text-center hover:border-cyan-500/50 transition-all hover:scale-105">
+            <div className="text-3xl mb-1">⭐</div>
+            <div className="text-xs font-semibold text-cyan-300">5-Star Mentor</div>
+          </div>
+          <div className="bg-slate-900/60 border border-pink-500/30 rounded-xl p-3 text-center hover:border-pink-500/50 transition-all hover:scale-105">
+            <div className="text-3xl mb-1">🔥</div>
+            <div className="text-xs font-semibold text-pink-300">Weekly Streak</div>
+          </div>
+          <div className="bg-slate-900/60 border border-purple-500/30 rounded-xl p-3 text-center opacity-50">
+            <div className="text-3xl mb-1 grayscale">🎯</div>
+            <div className="text-xs font-semibold text-purple-300">10 Sessions</div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

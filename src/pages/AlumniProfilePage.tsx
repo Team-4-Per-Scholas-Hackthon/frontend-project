@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { apiClient } from "../clients/apiClient";
 
@@ -128,7 +128,7 @@ function AlumniProfilePage() {
       setProfile(normalized);
       setForm(normalized);
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 2000);
+      setTimeout(() => setSuccess(false), 3000);
     } catch (err: any) {
       console.error(err);
       setError(
@@ -146,158 +146,217 @@ function AlumniProfilePage() {
       {/* Header */}
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold text-sky-300">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
             Alumni Tutor Profile
           </h1>
           <p className="text-sm text-slate-400 mt-1">
             Share your skills and availability so learners can find and book you.
           </p>
         </div>
+        <Link
+          to="/dashboard/alumni"
+          className="px-5 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-sm font-semibold transition-all border border-slate-600 hover:border-slate-500"
+        >
+          ← Back to Dashboard
+        </Link>
       </header>
 
       {/* Alerts */}
       {error && (
-        <div className="text-sm text-red-400 bg-red-950/40 border border-red-700 rounded-lg px-4 py-3">
+        <div className="flex items-center gap-3 text-sm text-red-300 bg-red-950/40 border border-red-500/40 rounded-xl px-4 py-3">
+          <span className="text-lg">⚠️</span>
           {error}
         </div>
       )}
       {success && (
-        <div className="text-sm text-emerald-400 bg-emerald-950/40 border border-emerald-700 rounded-lg px-4 py-3">
+        <div className="flex items-center gap-3 text-sm text-emerald-300 bg-emerald-950/40 border border-emerald-500/40 rounded-xl px-4 py-3">
+          <span className="text-lg">✓</span>
           Profile saved successfully!
         </div>
       )}
 
-      {/* Card */}
-      <div className="bg-slate-800/60 border border-slate-700 rounded-lg p-6 space-y-6">
+      {/* Main Card */}
+      <div className="bg-slate-800/40 border border-slate-700 rounded-2xl p-6 space-y-6 hover:border-orange-500/30 transition-all">
         {loading ? (
-          <div className="flex items-center justify-center py-10">
-            <div className="h-8 w-8 border-b-2 border-sky-500 rounded-full animate-spin" />
+          <div className="flex items-center justify-center py-16">
+            <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <>
-            {/* Bio & cohort */}
+            {/* Bio Section */}
             <section className="space-y-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-500/30 to-pink-500/30 rounded-lg flex items-center justify-center border border-orange-400/30 shadow-lg shadow-orange-500/20">
+                  <span className="text-xl">📝</span>
+                </div>
+                <h2 className="text-lg font-bold text-orange-300">About You</h2>
+              </div>
+
               <div>
-                <label className="block text-sm text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                   About Me
                 </label>
                 <textarea
                   value={form.bio}
                   onChange={(e) => handleFieldChange("bio", e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 rounded bg-slate-950 border border-slate-700 text-sm text-slate-100"
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-xl bg-slate-900/60 border border-slate-700 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500/50 transition-colors resize-none"
                   placeholder="Describe your background and how you like to help learners..."
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                   Cohort / Program
                 </label>
                 <input
                   type="text"
                   value={form.cohort}
                   onChange={(e) => handleFieldChange("cohort", e.target.value)}
-                  className="w-full px-3 py-2 rounded bg-slate-950 border border-slate-700 text-sm text-slate-100"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-900/60 border border-slate-700 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500/50 transition-colors"
                   placeholder="e.g., 2021-SE-Atlanta"
                 />
               </div>
             </section>
 
-            {/* Skills */}
-            <section className="space-y-3">
-              <label className="block text-sm text-slate-300 mb-1">
-                Skills you can tutor in
-              </label>
-              <input
-                type="text"
-                value={form.skills.join(", ")}
-                onChange={(e) =>
-                  handleFieldChange(
-                    "skills",
-                    e.target.value
-                      .split(",")
-                      .map((s) => s.trim())
-                      .filter(Boolean)
-                  )
-                }
-                className="w-full px-3 py-2 rounded bg-slate-950 border border-slate-700 text-sm text-slate-100"
-                placeholder="e.g., React, Python, Networking"
-              />
-              <p className="text-xs text-slate-400">
-                Separate skills with commas. These are used for matching you with learners.
-              </p>
+            {/* Skills Section */}
+            <section className="space-y-3 pt-4 border-t border-slate-700">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-lg flex items-center justify-center border border-cyan-400/30 shadow-lg shadow-cyan-500/20">
+                  <span className="text-xl">🎯</span>
+                </div>
+                <h2 className="text-lg font-bold text-cyan-300">Skills You Teach</h2>
+              </div>
+
+              <div>
+                <input
+                  type="text"
+                  value={form.skills.join(", ")}
+                  onChange={(e) =>
+                    handleFieldChange(
+                      "skills",
+                      e.target.value
+                        .split(",")
+                        .map((s) => s.trim())
+                        .filter(Boolean)
+                    )
+                  }
+                  className="w-full px-4 py-3 rounded-xl bg-slate-900/60 border border-slate-700 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 transition-colors"
+                  placeholder="e.g., React, Python, Networking"
+                />
+                <p className="text-xs text-slate-500 mt-2">
+                  Separate skills with commas. These are used for matching you with learners.
+                </p>
+              </div>
+
+              {/* Skills Preview */}
+              {form.skills.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {form.skills.map((skill, idx) => (
+                    <span
+                      key={idx}
+                      className="px-3 py-1.5 rounded-full bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-cyan-300 text-sm font-medium border border-cyan-500/30"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
             </section>
 
-            {/* Availability */}
-            <section className="space-y-3">
+            {/* Availability Section */}
+            <section className="space-y-4 pt-4 border-t border-slate-700">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-emerald-300">
-                  Availability
-                </h2>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500/30 to-cyan-500/30 rounded-lg flex items-center justify-center border border-emerald-400/30 shadow-lg shadow-emerald-500/20">
+                    <span className="text-xl">📅</span>
+                  </div>
+                  <h2 className="text-lg font-bold text-emerald-300">Availability</h2>
+                </div>
                 <button
                   type="button"
                   onClick={addAvailability}
-                  className="px-3 py-1.5 rounded bg-sky-500 hover:bg-sky-600 text-xs font-medium text-white"
+                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white text-sm font-semibold transition-all shadow-lg shadow-emerald-500/20 hover:scale-105"
                 >
-                  Add time slot
+                  + Add Time Slot
                 </button>
               </div>
 
               {form.availability.length === 0 && (
-                <p className="text-xs text-slate-400">
-                  Add a few time slots when you are available to tutor each week.
+                <p className="text-sm text-slate-400 bg-slate-900/30 rounded-xl p-4 border border-slate-700 border-dashed text-center">
+                  No availability set yet. Add time slots when you're free to tutor.
                 </p>
               )}
 
-              {form.availability.map((slot, index) => (
-                <div
-                  key={index}
-                  className="flex flex-wrap gap-2 items-center"
-                >
-                  <input
-                    type="date"
-                    value={slot.date}
-                    onChange={(e) =>
-                      handleAvailabilityChange(index, "date", e.target.value)
-                    }
-                    className="px-2 py-1 rounded bg-slate-950 border border-slate-700 text-xs text-slate-100"
-                  />
-                  <input
-                    type="time"
-                    value={slot.startTime}
-                    onChange={(e) =>
-                      handleAvailabilityChange(index, "startTime", e.target.value)
-                    }
-                    className="px-2 py-1 rounded bg-slate-950 border border-slate-700 text-xs text-slate-100"
-                  />
-                  <input
-                    type="time"
-                    value={slot.endTime}
-                    onChange={(e) =>
-                      handleAvailabilityChange(index, "endTime", e.target.value)
-                    }
-                    className="px-2 py-1 rounded bg-slate-950 border border-slate-700 text-xs text-slate-100"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeAvailability(index)}
-                    className="px-2 py-1 rounded bg-red-500 hover:bg-red-600 text-xs text-white"
+              <div className="space-y-3">
+                {form.availability.map((slot, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-wrap gap-3 items-center bg-slate-900/50 border border-slate-700 rounded-xl p-4 hover:border-emerald-500/30 transition-all"
                   >
-                    Remove
-                  </button>
-                </div>
-              ))}
+                    <div className="flex-1 min-w-[140px]">
+                      <label className="block text-xs text-slate-500 mb-1">Date</label>
+                      <input
+                        type="date"
+                        value={slot.date}
+                        onChange={(e) =>
+                          handleAvailabilityChange(index, "date", e.target.value)
+                        }
+                        className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-600 text-sm text-slate-100 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-[120px]">
+                      <label className="block text-xs text-slate-500 mb-1">Start Time</label>
+                      <input
+                        type="time"
+                        value={slot.startTime}
+                        onChange={(e) =>
+                          handleAvailabilityChange(index, "startTime", e.target.value)
+                        }
+                        className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-600 text-sm text-slate-100 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-[120px]">
+                      <label className="block text-xs text-slate-500 mb-1">End Time</label>
+                      <input
+                        type="time"
+                        value={slot.endTime}
+                        onChange={(e) =>
+                          handleAvailabilityChange(index, "endTime", e.target.value)
+                        }
+                        className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-600 text-sm text-slate-100 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={() => removeAvailability(index)}
+                        className="px-3 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm font-medium border border-red-500/30 hover:border-red-500/50 transition-all mt-5"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </section>
 
-            <div className="flex justify-end">
+            {/* Save Button */}
+            <div className="flex justify-end pt-4 border-t border-slate-700">
               <button
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="px-4 py-2 rounded bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold transition-all shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
               >
-                {saving ? "Saving..." : "Save Profile"}
+                {saving ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Saving...
+                  </span>
+                ) : (
+                  "Save Profile"
+                )}
               </button>
             </div>
           </>
