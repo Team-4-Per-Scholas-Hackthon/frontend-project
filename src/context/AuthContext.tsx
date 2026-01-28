@@ -39,6 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const saveAuth = (userData: AnyUser, jwt: string) => {
 		setUser(userData);
 		setToken(jwt);
+		//we need to delete this  next line due to security issue
 		localStorage.setItem("peertrack_user", JSON.stringify(userData));
 		localStorage.setItem("peertrack_token", jwt);
 	};
@@ -57,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		const popup = window.open(
 			`${import.meta.env.VITE_BACKEND_URL}/users/auth/${provider}`,
 			"_blank",
-			"width=500,height=600"
+			"width=500,height=600",
 		);
 
 		// Listen for message from popup
